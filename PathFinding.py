@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from Utils import *
+import matplotlib.pyplot as plt
 
 class Node:
     def __init__(self, coords, map2d, parent=None):
@@ -15,7 +16,6 @@ class Node:
             self.h = Utils.distance(coords, self.map2D.end_quantified)
             self.g = 0
             self.f = self.h
-            print("No parent")
             
     def __hash__(self):
         return hash(tuple(self.coords))
@@ -50,9 +50,9 @@ class PathFinding:
         return True
     
     def is_shorter_path_to_node(self, node):
-        if node in self.open_hashmap:
-            if self.open_hashmap[tuple(node.coords)].f > node.f:
-                print("Replace ", self.open_hashmap[tuple(node.coords)], " with ", node)
+        if tuple(node.coords) in self.open_hashmap:
+            if self.open_hashmap[tuple(node.coords)].g > node.g:
+                #print("Replace ", self.open_hashmap[tuple(node.coords)], " with ", node)
                 self.open_hashmap[tuple(node.coords)] = node
                 return True
             
@@ -71,7 +71,7 @@ class PathFinding:
                 
                 
                 if neigh_node not in self.closed_set:
-                    if neigh_node not in self.open_hashmap or self.is_shorter_path_to_node(neigh_node):
+                    if tuple(neigh_node.coords) not in self.open_hashmap or self.is_shorter_path_to_node(neigh_node):
                         
                         if neigh_node not in self.open_hashmap:
                             self.open_hashmap[tuple(neigh_coords)] = neigh_node
@@ -83,7 +83,10 @@ class PathFinding:
 
     def astar(self):
         
+        count = 0
+
         while self.open_hashmap:
+            count += 1
             self.current_node = min(self.open_hashmap.values(),key=lambda k: k.f)
             
             del self.open_hashmap[tuple(self.current_node.coords)]
@@ -94,10 +97,11 @@ class PathFinding:
                 break
             
             self.check_neighbors(self.current_node)
+
             
-            
-        
-        
+        print(count)
+
+
         backtrack = []
         node = self.current_node
         
@@ -107,5 +111,10 @@ class PathFinding:
  
         path = np.stack(backtrack)
         print(path)
-        #print(self.closed_set)
         return path
+
+    def visualize_path(self):
+        np.add.at(self.map2D.grid, tuple(zip(*self.astar())), 1)
+
+        plt.figure(figsize = (20,15))
+        plt.imshow(self.map2D.grid)

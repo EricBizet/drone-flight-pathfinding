@@ -9,6 +9,6 @@ map2d.generate_grid()
 map2d.discretize_start_end()
 
 pf = PathFinding(map2d)
-pf.astar()
+pf.visualize_path()
 
 input("Press ENTER to exit")
