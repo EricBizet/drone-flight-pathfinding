@@ -36,7 +36,6 @@ class Map2D:
 
         with open(path, "r") as f:
             reader = csv.reader(f, delimiter=",")
-            read_sweep_data = True
             n_sweep_in_scan = 0
             current_sweep = 99999
             current_scan = 0
@@ -57,6 +56,8 @@ class Map2D:
 
         obstacle_df = pd.DataFrame(lidar_data)
         self.obstacle_coords = obstacle_df.join(other=self.scan_pos, on="Scan")
+
+        self.obstacle_coords = self.obstacle_coords[self.obstacle_coords["Distance"]> 100]
         
         # Compute absolute position of LIDAR detection points
         self.obstacle_coords['X'] = self.obstacle_coords['X'] + ((self.obstacle_coords['Distance'] / 1000) * np.cos(np.radians(self.obstacle_coords['Angle'])))
@@ -115,13 +116,3 @@ class Map2D:
         self.end_quantified = np.array([np.digitize(end_point["X"], bins=self.X_bin),np.digitize(end_point["Y"], bins=self.Y_bin)])
 
         #print(self.start_quantified, self.end_quantified)
-    
-map = Map2D()
-map.load_path_data("data/FlightPath.csv")
-map.load_lidar_data("data/LIDARPoints.csv")
-map.view_obstacles()
-map.generate_grid()
-map.discretize_start_end()
-
-input("Press ENTER to exit")
-
