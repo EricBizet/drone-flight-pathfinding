@@ -9,6 +9,18 @@ class Map2D:
         self.scan_pos = None
         self.obstacle_coords = None
 
+        self.grid = None
+        self.X_res = None
+        self.Y_res = None
+        self.X_bin = None
+        self.Y_bin = None
+
+
+        self.tolerance = 0
+
+        self.start_quantified = None
+        self.end_quantified = None
+
     def load_path_data(self, path):
 
         raw_data = pd.read_csv(path, header=None)
@@ -63,11 +75,53 @@ class Map2D:
 
         ax1.legend(loc="lower left")
         plt.show()
+
+    def quantize_obstacles_coords(self):
+        grid_coords = self.obstacle_coords[["X", "Y"]].copy()
+
+        division_size = 0.1 # 10cm by 10cm subdivisions
+
+        self.X_res = int((grid_coords["X"].max() - grid_coords["X"].min()) / division_size)
+        self.Y_res = int((grid_coords["Y"].max() - grid_coords["Y"].min()) / division_size)
+
+        self.X_bin = np.linspace(grid_coords["X"].min(), grid_coords["X"].max(), self.X_res)
+        self.Y_bin = np.linspace(grid_coords["Y"].min(), grid_coords["Y"].max(), self.Y_res)
+
+        x_quantized_coords = np.digitize(grid_coords["X"], bins=self.X_bin)
+        y_quantized_coords = np.digitize(grid_coords["Y"], bins=self.Y_bin)
+
+        grid_obstacles_coords = np.c_[x_quantized_coords, y_quantized_coords]
+        grid_obstacles_coords = grid_obstacles_coords - 1
+
+        return grid_obstacles_coords
+
+    def generate_grid(self):
+        discrete_obstacle_coords = self.quantize_obstacles_coords()
+
+        self.grid = np.zeros((self.X_res, self.Y_res), int)
+        np.add.at(self.grid, tuple(zip(*discrete_obstacle_coords)), 1)
+
+       
+        self.grid = self.grid > self.tolerance
+
+        # plt.figure(figsize = (20,15))
+        # plt.imshow(self.grid)
+
+    def discretize_start_end(self):
+        start_point = self.scan_pos.iloc[0]
+        end_point = self.scan_pos.iloc[-1]
+
+        self.start_quantified = np.array([np.digitize(start_point["X"], bins=self.X_bin),np.digitize(start_point["Y"], bins=self.Y_bin)])
+        self.end_quantified = np.array([np.digitize(end_point["X"], bins=self.X_bin),np.digitize(end_point["Y"], bins=self.Y_bin)])
+
+        #print(self.start_quantified, self.end_quantified)
     
 map = Map2D()
 map.load_path_data("data/FlightPath.csv")
 map.load_lidar_data("data/LIDARPoints.csv")
 map.view_obstacles()
+map.generate_grid()
+map.discretize_start_end()
 
 input("Press ENTER to exit")
 
