@@ -9,11 +9,11 @@ class Node:
         self.parent = parent
         self.map2D = map2d
         if parent:
-            self.h = Utils.distance(coords, self.map2D.end_quantified)
-            self.g = Utils.distance(coords, parent.coords) + parent.g
+            self.h = Utils.euclidean_distance(coords, self.map2D.end_quantified)
+            self.g = Utils.euclidean_distance(coords, parent.coords) + parent.g
             self.f = self.h + self.g  
         else:
-            self.h = Utils.distance(coords, self.map2D.end_quantified)
+            self.h = Utils.euclidean_distance(coords, self.map2D.end_quantified)
             self.g = 0
             self.f = self.h
             
@@ -47,7 +47,7 @@ class PathFinding:
                 if not np.any(collision_map):
                     return False
 
-        return True
+                return True
     
     def is_shorter_path_to_node(self, node):
         if tuple(node.coords) in self.open_hashmap:
@@ -76,30 +76,23 @@ class PathFinding:
                         if neigh_node not in self.open_hashmap:
                             self.open_hashmap[tuple(neigh_coords)] = neigh_node
                             #print("Add: ", neigh_node)
-                else:
-                    print("Closed skip")
             
             
 
     def astar(self):
-        
-        count = 0
 
+        print("Computing path...")
         while self.open_hashmap:
-            count += 1
             self.current_node = min(self.open_hashmap.values(),key=lambda k: k.f)
             
             del self.open_hashmap[tuple(self.current_node.coords)]
             self.closed_set.add(self.current_node)
 
             if np.array_equal(self.current_node.coords, self.map2D.end_quantified):
-                print("Found path")
+                print("Found path.")
                 break
             
             self.check_neighbors(self.current_node)
-
-            
-        print(count)
 
 
         backtrack = []
@@ -110,7 +103,6 @@ class PathFinding:
             node = node.parent
  
         path = np.stack(backtrack)
-        print(path)
         return path
 
     def visualize_path(self):
