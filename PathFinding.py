@@ -39,22 +39,27 @@ class PathFinding:
     
     def is_colliding(self, coords):
         #check if drone is in bounds
-        if coords[0] - self.drone_radius >= 0 and coords[0] + self.drone_radius < self.map2D.grid.shape[0]:
-            if coords[1] - self.drone_radius >= 0 and coords[1] + self.drone_radius < self.map2D.grid.shape[1]:
-                # check if drone is colliding an obstacle
-                collision_map = self.map2D.grid[coords[0] - self.drone_radius:coords[0] + self.drone_radius+ 1,
-                    coords[1] - self.drone_radius:coords[1] + self.drone_radius+ 1]
-                if not np.any(collision_map):
-                    return False
+        if tuple(coords) in self.closed_set:
+            
+            return True
+        else:
+            if coords[0] - self.drone_radius >= 0 and coords[0] + self.drone_radius < self.map2D.grid.shape[0]:
+                if coords[1] - self.drone_radius >= 0 and coords[1] + self.drone_radius < self.map2D.grid.shape[1]:
+                    # check if drone is colliding an obstacle
+                    collision_map = self.map2D.grid[coords[0] - self.drone_radius:coords[0] + self.drone_radius+ 1,
+                        coords[1] - self.drone_radius:coords[1] + self.drone_radius+ 1]
+                    if not np.any(collision_map):
+                        return False
+        
+        self.closed_set.add(tuple(coords))
 
-                return True
+        return True
     
     def is_shorter_path_to_node(self, node):
-        if tuple(node.coords) in self.open_hashmap:
-            if self.open_hashmap[tuple(node.coords)].g > node.g:
-                #print("Replace ", self.open_hashmap[tuple(node.coords)], " with ", node)
-                self.open_hashmap[tuple(node.coords)] = node
-                return True
+        if self.open_hashmap[tuple(node.coords)].g > node.g:
+            #print("Replace ", self.open_hashmap[tuple(node.coords)], " with ", node)
+            self.open_hashmap[tuple(node.coords)] = node
+            return True
             
         return False
 
@@ -66,34 +71,33 @@ class PathFinding:
         for neigh_offset in neighbors_offset:
             neigh_coords = node.coords + neigh_offset
 
+            neigh_node = Node(neigh_coords, self.map2D, self.current_node)
+
             if(not self.is_colliding(neigh_coords)):
-                neigh_node = Node(neigh_coords, self.map2D, self.current_node)
-                
-                
-                if neigh_node not in self.closed_set:
-                    if tuple(neigh_node.coords) not in self.open_hashmap or self.is_shorter_path_to_node(neigh_node):
-                        
-                        if neigh_node not in self.open_hashmap:
-                            self.open_hashmap[tuple(neigh_coords)] = neigh_node
-                            #print("Add: ", neigh_node)
+                                    
+                if tuple(neigh_node.coords) not in self.open_hashmap or self.is_shorter_path_to_node(neigh_node):
+                    
+                    self.open_hashmap[tuple(neigh_coords)] = neigh_node
+                        #print("Add: ", neigh_node)
             
             
 
     def astar(self):
 
+        count = 0
         print("Computing path...")
         while self.open_hashmap:
             self.current_node = min(self.open_hashmap.values(),key=lambda k: k.f)
             
             del self.open_hashmap[tuple(self.current_node.coords)]
-            self.closed_set.add(self.current_node)
+            self.closed_set.add(tuple(self.current_node.coords))
 
             if np.array_equal(self.current_node.coords, self.map2D.end_quantified):
                 print("Found path.")
                 break
             
             self.check_neighbors(self.current_node)
-
+            count += 1
 
         backtrack = []
         node = self.current_node
