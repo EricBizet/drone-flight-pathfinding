@@ -11,7 +11,17 @@
 
 ## Requirements
 
+All needed Python packages are in `requirements.txt`. If needed run:
+
+```console
+pip3 install -r requirements.txt
+```
+
 ## Running the program
+
+```console
+python3 main.py
+```
 
 # Workflow
 
