@@ -4,7 +4,7 @@ import time
 
 map2d = Map2D()
 map2d.load_path_data("data/FlightPath.csv")
-map2d.load_lidar_data("data/LIDARPoints.csv")
+map2d.load_lidar_data("data/LIDARPoints.csv") 
 map2d.view_obstacles("LIDAR Obstacle detection / Path", 5) # View 6th 360-scan data
 map2d.generate_grid()
 
