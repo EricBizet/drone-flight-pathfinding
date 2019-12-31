@@ -2,6 +2,7 @@ import math
 import numpy as np
 from Utils import *
 import matplotlib.pyplot as plt
+import csv
 
 class Node:
     def __init__(self, coords, map2d, parent=None):
@@ -36,6 +37,8 @@ class PathFinding:
         self.closed_set = set()
         self.current_node = None
         self.drone_radius = 2
+
+        self.new_path = None
     
     def is_colliding(self, coords):
         #check if drone is in bounds
@@ -109,8 +112,28 @@ class PathFinding:
         path = np.stack(backtrack)
         return path
 
+    def generate_path(self):
+        self.new_path = self.astar()
+
     def visualize_path(self):
-        np.add.at(self.map2D.grid, tuple(zip(*self.astar())), 1)
+        grid_copy = self.map2D.grid.copy()
+
+        np.add.at(grid_copy, tuple(zip(*self.new_path)), 1)
 
         plt.figure(figsize = (20,15))
-        plt.imshow(self.map2D.grid)
+        plt.imshow(grid_copy)
+
+    def write_path_csv(self, path):
+        csv_path = self.new_path.copy().astype("float32")
+        csv_path = np.flip(csv_path, 0)
+        csv_path[:, 0] = csv_path[:, 0] * (self.map2D.X_lidar_size / self.map2D.X_res) + self.map2D.X_lidar_offset
+        csv_path[:, 1] = csv_path[:, 1] * (self.map2D.Y_lidar_size / self.map2D.Y_res) + self.map2D.Y_lidar_offset
+
+        with open(path, 'w') as f:
+
+            writer = csv.writer(f)
+    
+            for i, point in enumerate(csv_path):
+                writer.writerow((i, 1))
+                writer.writerow(point)
+   

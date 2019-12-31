@@ -11,3 +11,5 @@ class Utils:
     def manhattan_distance(position, reference_point):
         #compute heuristic cost
         return abs(position[0] - reference_point[0]) + abs(position[1] - reference_point[1])
+
+    
