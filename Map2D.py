@@ -102,7 +102,7 @@ class Map2D:
         fig.canvas.set_window_title(title)
         ax1 = fig.add_subplot(111)
         ax1.set_xlabel("X position")
-        ax1.set_xlabel("Y position")
+        ax1.set_ylabel("Y position")
 
         ax1.plot(self.scan_pos['X'], self.scan_pos['Y'], "ok-", label='path', color="orange")
 
