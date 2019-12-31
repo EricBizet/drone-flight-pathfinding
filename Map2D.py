@@ -76,7 +76,6 @@ class Map2D:
     
     def save_lidar_dimensions(self):
         self.X_lidar_offset = self.obstacle_coords["X"].min()
-        print(self.X_lidar_offset)
         self.Y_lidar_offset = self.obstacle_coords["Y"].min()
         self.X_lidar_size = self.obstacle_coords["X"].max() - self.obstacle_coords["X"].min()
         self.Y_lidar_size = self.obstacle_coords["Y"].max() - self.obstacle_coords["Y"].min()
@@ -84,15 +83,22 @@ class Map2D:
     def view_drone_path(self):
 
         ax1 = self.scan_pos.plot(x='X', y='Y')
-        ax1.set_title("Drone path")
-        plt.show()
 
-    def view_obstacles(self):
+    def view_obstacles(self, title, scan_id=None):
         fig = plt.figure(figsize=(10, 7))
+        fig.canvas.set_window_title(title)
         ax1 = fig.add_subplot(111)
+        ax1.set_xlabel("X position")
+        ax1.set_xlabel("Y position")
 
-        ax1.scatter(self.obstacle_coords['X'][self.obstacle_coords['Scan'] > 0], self.obstacle_coords['Y'][self.obstacle_coords['Scan'] > 0], marker="s", label='obstacle', alpha=0.3)
         ax1.plot(self.scan_pos['X'], self.scan_pos['Y'], "ok-", label='path', color="orange")
+
+        if scan_id:
+            ax1.scatter(self.obstacle_coords['X'][self.obstacle_coords['Scan'] == scan_id], self.obstacle_coords['Y'][self.obstacle_coords['Scan'] == scan_id], marker="s", label='obstacle', alpha=0.3)
+            ax1.plot(self.scan_pos.iloc[scan_id]['X'], self.scan_pos.iloc[scan_id]['Y'], "o", label='drone position', color="red", markersize=10)
+        else:
+            ax1.scatter(self.obstacle_coords['X'], self.obstacle_coords['Y'], marker="s", label='obstacle', alpha=0.3)
+        
 
         ax1.legend(loc="lower left")
         plt.show()

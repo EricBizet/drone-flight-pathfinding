@@ -115,12 +115,14 @@ class PathFinding:
     def generate_path(self):
         self.new_path = self.astar()
 
-    def visualize_path(self):
+    def visualize_path(self, title):
         grid_copy = self.map2D.grid.copy()
 
         np.add.at(grid_copy, tuple(zip(*self.new_path)), 1)
 
-        plt.figure(figsize = (20,15))
+        
+        fig = plt.figure(figsize = (20,15))
+        fig.canvas.set_window_title(title)
         plt.imshow(grid_copy)
 
     def write_path_csv(self, path):
