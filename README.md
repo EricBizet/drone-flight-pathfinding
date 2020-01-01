@@ -29,13 +29,13 @@ I decided to pick Python so I could use *Matplotlib* for easy visualisation whil
 
 I started by creating a notebook for visualizing progression of data handling and processing. I took the liberty of adding some documentation in it, therefore feel free to check it out.
 
-Once I had come up with solid data handling and good progression within the tasks, I started translating the code into a Python scripts.
+Once I had come up with solid data handling and good progression within the tasks, I started translating the code into Python scripts.
 
 ## Data visualization
 
 The idea behind it was computing the absolute position of every obstacle points obtained while scanning the set. I used the drone flight data to compute back the offset of each obstacle point.
 
-Final dataframe look like this:
+Final dataframe looks like this:
 
 ```python
        Scan       Angle  Distance          X         Y
@@ -75,7 +75,7 @@ We can filter out noise which yields the following binary map. Since it is a toy
 
 ![](images/Binary_Map.png)
 
-After discretizing our space, the subdivison serve as nodes for A* search. The following path is obtained:
+After discretizing our space, the subdivisions serve as nodes for A* search. The following path is obtained:
 
 ![](images/Alternative_Path.png)
 

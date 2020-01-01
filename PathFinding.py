@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import csv
 
 class Node:
-    """Represent node object in A* search algorithm"""
+    """Represents node object in A* search algorithm"""
 
     def __init__(self, coords, map2d, parent=None):
         """Compute f,g and h cost of a node"""

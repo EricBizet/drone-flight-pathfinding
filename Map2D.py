@@ -95,7 +95,7 @@ class Map2D:
     def view_obstacles(self, title, scan_id=None):
         """Visualise obstacles from a given scan id or from all scan at once
         
-        Second case stack all absolute points onto a same representation. Alpha levels reveals 'hard to detect' points
+        Second case stack all absolute points onto a same representation. Alpha levels reveal 'hard to detect' points
         
         """
         fig = plt.figure(figsize=(10, 7))
@@ -117,7 +117,7 @@ class Map2D:
         plt.show()
 
     def quantize_obstacles_coords(self):
-        """Discretize all real world position in a grid for later computation
+        """Discretize all real world obstacle positions in a grid for later computation
         
         Compute new coords within the new grid
         """
